@@ -52,6 +52,22 @@ def init_db():
         )
     """)
 
+    cursor.execute("""
+           CREATE OR REPLACE VIEW view_recipe_details AS
+           SELECT 
+               r.id AS recipe_id,
+               r.title AS recipe_title,
+               r.description AS recipe_description,
+               r.difficulty,
+               r.is_vegetarian,
+               r.created_at,
+               GROUP_CONCAT(CONCAT(i.name, ':', ri.amount, ri.unit) SEPARATOR ', ') AS ingredients
+           FROM recipe r
+           LEFT JOIN recipe_ingredient ri ON r.id = ri.recipe_id
+           LEFT JOIN ingredient i ON ri.ingredient_id = i.id
+           GROUP BY r.id
+       """)
+
     db.commit()
     cursor.close()
     print("Database initialized")
