@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Recipe } from "./types.ts";
+import type { Recipe } from "../types.ts";
 
 export default function RecipeList() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -45,7 +45,6 @@ export default function RecipeList() {
         </div>
       ))}
       </div>
-
     </div>
   );
 }

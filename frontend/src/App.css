@@ -3,20 +3,6 @@
   margin: 0 auto auto 0;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-    color: #747bff;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -24,18 +10,22 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-    background-color: #f9f9f9;
+  background-color: #787878;
+  color: white;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition: all 0.25s ease;
 }
 
+button:hover {
+  background-color: #535353;
+}
+
+.recipes-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
 
 .recipe-card {
   border: 1px solid #ccc;
@@ -48,10 +38,90 @@ button:focus-visible {
   margin-top: 0;
 }
 
-.recipes-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
+
+
+.add-recipe-form {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  font-family: sans-serif;
 }
 
+.add-recipe-form h2 {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.add-recipe-form div {
+  margin-bottom: 1rem;
+}
+
+.add-recipe-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.add-recipe-form input,
+.add-recipe-form textarea,
+.add-recipe-form select {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.ingredient-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ingredient-row input {
+  flex: 1;
+}
+
+.ingredient-row button {
+  flex: 0 0 auto;
+  background-color: #c32312;
+  color: white;
+  border: none;
+  padding: 0 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ingredient-row button:hover {
+  background-color: #8e1c10;
+}
+
+.add-recipe-form button[type="button"] {
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.add-recipe-form button[type="submit"] {
+  background-color: #1ca337;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.add-recipe-form button[type="submit"]:hover {
+  background-color: #0e7723;
+}

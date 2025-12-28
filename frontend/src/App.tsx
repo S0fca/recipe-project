@@ -1,11 +1,13 @@
 import './App.css'
-import RecipeList from "./RecipeList.tsx";
+import RecipeList from "./components/RecipeList.tsx";
+import AddRecipeForm from "./components/AddRecipeForm.tsx";
 
 function App() {
 
   return (
     <>
-      <RecipeList />
+        <RecipeList />
+        <AddRecipeForm onRecipeAdded={() => window.location.reload()} />
     </>
   )
 }
