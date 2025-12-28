@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 class Ingredient:
     def __init__(self, id: int, name: str, amount: float = None, unit: str = None):
@@ -36,4 +36,19 @@ class Recipe:
             "is_vegetarian": self.is_vegetarian,
             "created_at": str(self.created_at),
             "ingredients": [ing.to_dict() for ing in self.ingredients]
+        }
+
+class Cookbook:
+    def __init__(self, id: int, name: str, description: str, recipe_count: int = 0):
+        self.id = id
+        self.name = name
+        self.description = description
+        self.recipe_count = recipe_count
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "recipe_count": self.recipe_count
         }

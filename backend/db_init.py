@@ -68,6 +68,18 @@ def init_db():
            GROUP BY r.id
        """)
 
+    cursor.execute("""
+    CREATE OR REPLACE VIEW view_cookbook_summary AS
+    SELECT 
+        c.id AS cookbook_id,
+        c.name AS cookbook_name,
+        c.description AS cookbook_description,
+        COUNT(rc.recipe_id) AS recipe_count
+    FROM cookbook c
+    LEFT JOIN recipe_cookbook rc ON c.id = rc.cookbook_id
+    GROUP BY c.id, c.name, c.description
+    """)
+
     db.commit()
     cursor.close()
     print("Database initialized")

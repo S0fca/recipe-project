@@ -3,43 +3,54 @@ from model import Recipe, Ingredient
 
 class RecipeRepository:
     def __init__(self):
-        self.db = DatabaseConnection().connect()
+        self.db_conn = DatabaseConnection()
 
-    def get_all_view(self):
-        cursor = self.db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM view_recipe_details")
-        rows = cursor.fetchall()
-        recipes = []
+    def get_all_view(self) -> list[Recipe]:
+        db = self.db_conn.connect()
+        cursor = db.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM view_recipe_details")
+            rows = cursor.fetchall()
+        finally:
+            if cursor:
+                cursor.close()
+
+        recipes_map: dict[int, Recipe] = {}
         for row in rows:
-            ingredients_list = []
-            if row["ingredients"]:
-                for ing_str in row["ingredients"].split(", "):
-                    parts = ing_str.split(":")
-                    name = parts[0]
-                    amount_unit = parts[1]
-                    amount = float(''.join(filter(lambda x: x.isdigit() or x=='.', amount_unit)))
-                    unit = ''.join(filter(lambda x: x.isalpha(), amount_unit))
-                    ingredients_list.append(Ingredient(id=None, name=name, amount=amount, unit=unit))
-            recipe = Recipe(
-                id=row["recipe_id"],
-                title=row["recipe_title"],
-                description=row["recipe_description"],
-                difficulty=row["difficulty"],
-                is_vegetarian=row["is_vegetarian"],
-                created_at=row["created_at"],
-                ingredients=ingredients_list
-            )
-            recipes.append(recipe)
-        cursor.close()
-        return recipes
+            rid = row["recipe_id"]
+            if rid not in recipes_map:
+                recipes_map[rid] = Recipe(
+                    id=rid,
+                    title=row.get("recipe_title", ""),
+                    description=row.get("recipe_description", ""),
+                    difficulty=row.get("difficulty", "easy"),
+                    is_vegetarian=row.get("is_vegetarian", False),
+                    created_at=row.get("created_at"),
+                    ingredients=[]
+                )
+
+            ingredients_str = row.get("ingredients")
+            ingredients = []
+            if ingredients_str:
+                for item in ingredients_str.split(", "):
+                    try:
+                        name, rest = item.split(":")
+                        amount = ''.join([c for c in rest if c.isdigit() or c == '.'])
+                        unit = rest.replace(amount, '')
+                        ingredients.append(Ingredient(id=None, name=name, amount=float(amount), unit=unit))
+                    except Exception:
+                        continue
+            recipes_map[rid].ingredients = ingredients
+
+        return list(recipes_map.values())
+
 
     def add_recipe_with_ingredients(self, title: str, description: str, difficulty: str,
                                     is_vegetarian: bool, ingredients: list[Ingredient]):
         try:
-            self.db.commit()
-
-            cursor = self.db.cursor()
-            self.db.start_transaction()
+            db = self.db_conn.connect()
+            cursor = db.cursor()
+            db.start_transaction()
 
             cursor.execute("""
                    INSERT INTO recipe (title, description, difficulty, is_vegetarian)
@@ -61,12 +72,13 @@ class RecipeRepository:
                        VALUES (%s, %s, %s, %s)
                    """, (recipe_id, ing_id, ing.amount, ing.unit))
 
-            self.db.commit()
+            db.commit()
             cursor.close()
 
             return {"recipe_id": recipe_id, "title": title, "ingredients": [ing.to_dict() for ing in ingredients]}
         except Exception as e:
-            self.db.rollback()
+            db.rollback()
             raise e
         finally:
-            cursor.close()
+            if cursor:
+                cursor.close()
