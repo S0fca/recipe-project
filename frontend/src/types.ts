@@ -22,3 +22,10 @@ export interface IngredientInput {
   amount: number;
   unit: string;
 }
+
+export interface Cookbook {
+  id: number;
+  name: string;
+  description: string;
+  recipe_count: number;
+}

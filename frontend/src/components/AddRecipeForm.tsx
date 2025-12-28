@@ -64,7 +64,7 @@ export default function AddRecipeForm({ onRecipeAdded }: AddRecipeFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="add-recipe-form">
+    <form onSubmit={handleSubmit} className="add-form">
       <h2>Add Recipe</h2>
 
       <div>
