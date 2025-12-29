@@ -17,6 +17,23 @@ export default function RecipeList() {
       .finally(() => setLoading(false));
   }, []);
 
+  const handleDelete = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this recipe?")) return;
+
+    try {
+      const res = await fetch(`http://127.0.0.1:5000/api/recipes/${id}`, {
+        method: "DELETE",
+      });
+      const result = await res.json();
+
+      if (!res.ok) throw new Error(result.error || "Failed to delete recipe");
+
+      setRecipes((prev) => prev.filter((r) => r.id !== id));
+    } catch (err: any) {
+      alert(`Error deleting recipe: ${err.message}`);
+    }
+  };
+
   if (loading) return <p>Loading recipes...</p>;
   if (error) return <p>Error: {error}</p>;
 
@@ -25,25 +42,26 @@ export default function RecipeList() {
       <h2>Recipes</h2>
       <div className={"recipes-container"}>
         {recipes.map((recipe) => (
-        <div key={recipe.id} className="recipe-card">
-          <h3>{recipe.title}</h3>
-          <p>{recipe.description}</p>
-          <p>
-            Difficulty: {recipe.difficulty}
-          </p>
-          <p>
-            {recipe.is_vegetarian ? "Vegetarian" : "Non-vegetarian"}
-          </p>
-          <h4>Ingredients:</h4>
-          <ul>
-            {recipe.ingredients.map((ing) => (
-              <li key={`${recipe.id}-${ing.name}`}>
-                {ing.name} - {ing.amount} {ing.unit}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+            <div key={recipe.id} className="recipe-card">
+              <h3>{recipe.title}</h3>
+              <p>{recipe.description}</p>
+              <p>
+                Difficulty: {recipe.difficulty}
+              </p>
+              <p>
+                {recipe.is_vegetarian ? "Vegetarian" : "Non-vegetarian"}
+              </p>
+              <h4>Ingredients:</h4>
+              <ul>
+                {recipe.ingredients.map((ing) => (
+                    <li key={`${recipe.id}-${ing.name}`}>
+                      {ing.name} - {ing.amount} {ing.unit}
+                    </li>
+                ))}
+              </ul>
+              <button onClick={() => handleDelete(recipe.id)}>Delete</button>
+            </div>
+        ))}
       </div>
     </div>
   );

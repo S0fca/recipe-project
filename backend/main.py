@@ -66,6 +66,13 @@ def import_recipes():
     result = recipe_service.import_recipes(data["recipes"])
     return jsonify(result), 200
 
+@app.delete("/api/recipes/<int:recipe_id>")
+def delete_recipe(recipe_id: int):
+    result = recipe_service.delete_recipe(recipe_id)
+    if result["success"]:
+        return jsonify({"message": result["message"]}), 200
+    else:
+        return jsonify({"error": result["error"]}), 404
 
 
 

@@ -66,3 +66,33 @@ class RecipeRepository:
             return {"recipe_id": recipe_id, "title": title, "ingredients": [ing.to_dict() for ing in ingredients]}
         finally:
             cursor.close()
+
+    def delete_recipe(self, db, recipe_id: int) -> bool:
+        cursor = db.cursor()
+        try:
+            db.start_transaction()
+
+            cursor.execute(
+                "DELETE FROM recipe_ingredient WHERE recipe_id=%s",
+                (recipe_id,)
+            )
+
+            cursor.execute(
+                "DELETE FROM recipe_cookbook WHERE recipe_id=%s",
+                (recipe_id,)
+            )
+
+            cursor.execute(
+                "DELETE FROM recipe WHERE id=%s",
+                (recipe_id,)
+            )
+
+            db.commit()
+
+            return cursor.rowcount > 0
+        except Exception:
+            db.rollback()
+            raise
+        finally:
+            cursor.close()
+            db.close()

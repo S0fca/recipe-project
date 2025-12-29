@@ -66,3 +66,13 @@ class RecipeService:
             db.close()
 
         return {"imported": imported, "failed": len(errors), "errors": errors}
+
+    def delete_recipe(self, recipe_id: int) -> dict:
+        db = get_connection()
+        try:
+            deleted = self.repo.delete_recipe(db, recipe_id)
+            if not deleted:
+                return {"success": False, "error": "Recipe not found"}
+            return {"success": True, "message": "Recipe deleted"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
