@@ -1,7 +1,7 @@
-from db_singleton import DatabaseConnection
+from db_connection import get_connection
 
 def init_db():
-    db = DatabaseConnection().connect()
+    db = get_connection()
     cursor = db.cursor()
 
     cursor.execute("""
@@ -82,4 +82,5 @@ def init_db():
 
     db.commit()
     cursor.close()
-    print("Database initialized")
+    db.close()
+print("Database initialized")

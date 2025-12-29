@@ -1,19 +1,14 @@
-from db_singleton import DatabaseConnection
-from model import Recipe, Ingredient
+from backend.model import Recipe, Ingredient
+from typing import List
 
 class RecipeRepository:
-    def __init__(self):
-        self.db_conn = DatabaseConnection()
-
-    def get_all_view(self) -> list[Recipe]:
-        db = self.db_conn.connect()
+    def get_all_view(self, db) -> List[Recipe]:
         cursor = db.cursor(dictionary=True)
         try:
             cursor.execute("SELECT * FROM view_recipe_details")
             rows = cursor.fetchall()
         finally:
-            if cursor:
-                cursor.close()
+            cursor.close()
 
         recipes_map: dict[int, Recipe] = {}
         for row in rows:
@@ -44,18 +39,14 @@ class RecipeRepository:
 
         return list(recipes_map.values())
 
-
-    def add_recipe_with_ingredients(self, title: str, description: str, difficulty: str,
-                                    is_vegetarian: bool, ingredients: list[Ingredient]):
+    def add_recipe_with_ingredients(self, db, title: str, description: str, difficulty: str,
+                                    is_vegetarian: bool, ingredients: List[Ingredient]):
+        cursor = db.cursor()
         try:
-            db = self.db_conn.connect()
-            cursor = db.cursor()
-            db.start_transaction()
-
             cursor.execute("""
-                   INSERT INTO recipe (title, description, difficulty, is_vegetarian)
-                   VALUES (%s, %s, %s, %s)
-               """, (title, description, difficulty, is_vegetarian))
+                INSERT INTO recipe (title, description, difficulty, is_vegetarian)
+                VALUES (%s, %s, %s, %s)
+            """, (title, description, difficulty, is_vegetarian))
             recipe_id = cursor.lastrowid
 
             for ing in ingredients:
@@ -68,17 +59,10 @@ class RecipeRepository:
                     ing_id = cursor.lastrowid
 
                 cursor.execute("""
-                       INSERT INTO recipe_ingredient (recipe_id, ingredient_id, amount, unit)
-                       VALUES (%s, %s, %s, %s)
-                   """, (recipe_id, ing_id, ing.amount, ing.unit))
-
-            db.commit()
-            cursor.close()
+                    INSERT INTO recipe_ingredient (recipe_id, ingredient_id, amount, unit)
+                    VALUES (%s, %s, %s, %s)
+                """, (recipe_id, ing_id, ing.amount, ing.unit))
 
             return {"recipe_id": recipe_id, "title": title, "ingredients": [ing.to_dict() for ing in ingredients]}
-        except Exception as e:
-            db.rollback()
-            raise e
         finally:
-            if cursor:
-                cursor.close()
+            cursor.close()

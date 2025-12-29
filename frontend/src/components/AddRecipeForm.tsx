@@ -33,35 +33,40 @@ export default function AddRecipeForm({ onRecipeAdded }: AddRecipeFormProps) {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const res = await fetch("http://127.0.0.1:5000/api/recipes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          description,
-          difficulty,
-          is_vegetarian: isVegetarian,
-          ingredients,
-        }),
-      });
+  try {
+    const res = await fetch("http://127.0.0.1:5000/api/recipes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title,
+        description,
+        difficulty,
+        is_vegetarian: isVegetarian,
+        ingredients,
+      }),
+    });
 
-      if (!res.ok) throw new Error("Failed to add recipe");
+    const data = await res.json();
 
-      setTitle("");
-      setDescription("");
-      setDifficulty("easy");
-      setIsVegetarian(false);
-      setIngredients([{ name: "", amount: 0, unit: "" }]);
-
-      onRecipeAdded();
-    } catch (err) {
-      console.error(err);
-      alert("Error adding recipe");
+    if (!res.ok) {
+      alert(data.description || "Error adding recipe");
+      return;
     }
-  };
+
+    setTitle("");
+    setDescription("");
+    setDifficulty("easy");
+    setIsVegetarian(false);
+    setIngredients([{ name: "", amount: 0, unit: "" }]);
+
+    onRecipeAdded();
+  } catch (err) {
+    console.error(err);
+    alert("Invalid request");
+  }
+};
 
   return (
     <form onSubmit={handleSubmit} className="add-form">

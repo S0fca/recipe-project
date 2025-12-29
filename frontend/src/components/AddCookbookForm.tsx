@@ -11,27 +11,32 @@ export default function AddCookbookForm({ onCookbookAdded }: AddCookbookFormProp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const res = await fetch("http://127.0.0.1:5000/api/cookbooks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, description }),
-      });
+  try {
+    const res = await fetch("http://127.0.0.1:5000/api/cookbooks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, description }),
+    });
 
-      if (!res.ok) throw new Error("Failed to add cookbook");
+    const data = await res.json();
 
-      setName("");
-      setDescription("");
-      onCookbookAdded();
-    } catch (err) {
-      console.error(err);
-      alert("Error adding cookbook");
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      alert(data.description || "Error adding cookbook");
+      return;
     }
-  };
+
+    setName("");
+    setDescription("");
+    onCookbookAdded();
+  } catch (err) {
+    console.error(err);
+    alert("Invalid request");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <form onSubmit={handleSubmit} className="add-form">
