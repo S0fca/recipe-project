@@ -20,7 +20,13 @@ export default function AddRecipeForm({ onRecipeAdded }: AddRecipeFormProps) {
   value: IngredientInput[K]
 ) => {
   const newIngredients = [...ingredients];
-  newIngredients[index][field] = value;
+
+  if (field === "amount") {
+    newIngredients[index][field] = Math.max(0, value as number) as IngredientInput[K];
+  } else {
+    newIngredients[index][field] = value;
+  }
+
   setIngredients(newIngredients);
 };
 

@@ -15,6 +15,10 @@ class RecipeService:
 
     def add_recipe(self, title: str, description: str, difficulty: str,
                    is_vegetarian: bool, ingredients: list[Ingredient]):
+        for ing in ingredients:
+            if ing.amount < 0:
+                raise ValueError(f"Ingredient '{ing.name}' has negative amount: {ing.amount}")
+
         db = get_connection()
         try:
             db.start_transaction()
@@ -35,10 +39,14 @@ class RecipeService:
             db.start_transaction()
             for idx, recipe_data in enumerate(recipes_data):
                 try:
-                    ingredients = [
-                        Ingredient(id=None, name=i["name"], amount=i["amount"], unit=i["unit"])
-                        for i in recipe_data.get("ingredients", [])
-                    ]
+                    ingredients = []
+                    for i in recipe_data.get("ingredients", []):
+                        if i["amount"] < 0:
+                            raise ValueError(f"Ingredient '{i['name']}' has negative amount: {i['amount']}")
+                        ingredients.append(
+                            Ingredient(id=None, name=i["name"], amount=i["amount"], unit=i["unit"])
+                        )
+
                     self.repo.add_recipe_with_ingredients(
                         db,
                         title=recipe_data["title"],
