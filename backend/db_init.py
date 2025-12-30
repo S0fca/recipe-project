@@ -81,6 +81,6 @@ def init_db():
     """)
 
     db.commit()
+    print("Database initialized.")
     cursor.close()
     db.close()
-print("Database initialized")
