@@ -94,3 +94,31 @@ class CookbookRepository:
                 )
 
         return list(recipes_map.values())
+
+    def import_cookbooks(self, db, cookbooks_data: list[dict]) -> dict:
+        imported = 0
+        errors = []
+        cursor = db.cursor()
+        try:
+            db.start_transaction()
+            for idx, cb in enumerate(cookbooks_data):
+                name = cb.get("name")
+                description = cb.get("description", "")
+                if not name:
+                    errors.append({"index": idx, "error": "Missing name"})
+                    continue
+                try:
+                    cursor.execute(
+                        "INSERT INTO cookbook (name, description) VALUES (%s, %s)",
+                        (name, description)
+                    )
+                    imported += 1
+                except Exception as e:
+                    errors.append({"index": idx, "name": name, "error": str(e)})
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
+        finally:
+            cursor.close()
+        return {"imported": imported, "failed": len(errors), "errors": errors}

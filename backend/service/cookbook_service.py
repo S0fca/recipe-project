@@ -48,3 +48,11 @@ class CookbookService:
             return recipes
         finally:
             db.close()
+
+    def import_cookbooks(self, cookbooks_data: list[dict]):
+        db = get_connection()
+        try:
+            result = self.repo.import_cookbooks(db, cookbooks_data)
+            return result
+        finally:
+            db.close()

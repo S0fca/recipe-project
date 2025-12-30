@@ -127,6 +127,17 @@ def get_cookbook_recipes(cookbook_id: int):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.post("/api/import/cookbooks")
+def import_cookbooks():
+    data = request.json
+    if not data or "cookbooks" not in data:
+        return jsonify({"error": "Invalid import format"}), 400
+
+    try:
+        result = cookbook_service.import_cookbooks(data["cookbooks"])
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 
