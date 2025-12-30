@@ -1,4 +1,4 @@
-from backend.model import Cookbook
+from backend.model import Cookbook, Recipe, Ingredient
 from typing import List
 
 class CookbookRepository:
@@ -29,3 +29,68 @@ class CookbookRepository:
             return Cookbook(cursor.lastrowid, name, description)
         finally:
             cursor.close()
+
+    def add_recipe_to_cookbook(self, db, cookbook_id: int, recipe_id: int) -> bool:
+        cursor = db.cursor()
+        try:
+            cursor.execute(
+                "SELECT 1 FROM recipe_cookbook WHERE cookbook_id=%s AND recipe_id=%s",
+                (cookbook_id, recipe_id)
+            )
+            if cursor.fetchone():
+                return False
+
+            cursor.execute(
+                "INSERT INTO recipe_cookbook (cookbook_id, recipe_id) VALUES (%s, %s)",
+                (cookbook_id, recipe_id)
+            )
+            return True
+        finally:
+            cursor.close()
+
+    def get_recipes_in_cookbook(self, db, cookbook_id: int) -> list[Recipe]:
+        cursor = db.cursor(dictionary=True)
+        try:
+            cursor.execute("""
+                SELECT 
+                    r.id AS recipe_id,
+                    r.title AS recipe_title,
+                    r.description AS recipe_description,
+                    r.difficulty,
+                    r.is_vegetarian,
+                    i.name AS ingredient_name,
+                    ri.amount AS ingredient_amount,
+                    ri.unit AS ingredient_unit
+                FROM recipe r
+                JOIN recipe_cookbook rc ON r.id = rc.recipe_id
+                LEFT JOIN recipe_ingredient ri ON r.id = ri.recipe_id
+                LEFT JOIN ingredient i ON ri.ingredient_id = i.id
+                WHERE rc.cookbook_id = %s
+            """, (cookbook_id,))
+            rows = cursor.fetchall()
+        finally:
+            cursor.close()
+
+        recipes_map: dict[int, Recipe] = {}
+        for row in rows:
+            rid = row["recipe_id"]
+            if rid not in recipes_map:
+                recipes_map[rid] = Recipe(
+                    id=rid,
+                    title=row.get("recipe_title", ""),
+                    description=row.get("recipe_description", ""),
+                    difficulty=row.get("difficulty", "easy"),
+                    is_vegetarian=row.get("is_vegetarian", False),
+                    ingredients=[]
+                )
+            if row["ingredient_name"]:
+                recipes_map[rid].ingredients.append(
+                    Ingredient(
+                        id=None,
+                        name=row["ingredient_name"],
+                        amount=row["ingredient_amount"],
+                        unit=row["ingredient_unit"]
+                    )
+                )
+
+        return list(recipes_map.values())

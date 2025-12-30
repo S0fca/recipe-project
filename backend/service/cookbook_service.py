@@ -24,3 +24,27 @@ class CookbookService:
             raise
         finally:
             db.close()
+
+    def add_recipe_to_cookbook(self, cookbook_id: int, recipe_id: int) -> dict:
+        db = get_connection()
+        try:
+            db.start_transaction()
+            added = self.repo.add_recipe_to_cookbook(db, cookbook_id, recipe_id)
+            db.commit()
+
+            if not added:
+                return {"success": False, "error": "Recipe already in cookbook"}
+            return {"success": True, "message": "Recipe added to cookbook"}
+        except Exception as e:
+            db.rollback()
+            return {"success": False, "error": str(e)}
+        finally:
+            db.close()
+
+    def get_cookbook_recipes(self, cookbook_id: int):
+        db = get_connection()
+        try:
+            recipes = self.repo.get_recipes_in_cookbook(db, cookbook_id)
+            return recipes
+        finally:
+            db.close()

@@ -5,6 +5,7 @@ import CookbookList from "./components/CookbookList.tsx";
 import AddCookbookForm from "./components/AddCookbookForm.tsx";
 import {useState} from "react";
 import ImportRecipes from "./components/ImportRecipes.tsx";
+import AddRecipeToCookbook from "./components/AddRecipeToCookbook.tsx";
 
 function App() {
   const [activeTab, setActiveTab] = useState<"recipes" | "cookbooks">("recipes");
@@ -32,6 +33,7 @@ function App() {
             <>
                 <CookbookList/>
                 <AddCookbookForm onCookbookAdded={() => window.location.reload()}/>
+                <AddRecipeToCookbook />
             </>
           )}
       </>

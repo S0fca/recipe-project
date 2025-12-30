@@ -1,0 +1,56 @@
+import { useEffect, useState } from "react";
+import type { Recipe, Cookbook } from "../types.ts";
+
+interface CookbookDetailsProps {
+  cookbook: Cookbook;
+  onClose: () => void;
+}
+
+export default function CookbookDetails({ cookbook, onClose }: CookbookDetailsProps) {
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`http://127.0.0.1:5000/api/cookbooks/${cookbook.id}/recipes`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch recipes for cookbook");
+        return res.json();
+      })
+      .then((data) => setRecipes(data))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [cookbook.id]);
+
+  if (loading) return <p>Loading recipes...</p>;
+  if (error) return <p>Error: {error}</p>;
+
+  return (
+      <div style={{padding: "1rem"}}>
+          <div className="recipe-card">
+              <h2>{cookbook.name}</h2>
+              <p>{cookbook.description}</p>
+              <button onClick={onClose}>Close</button>
+              <h3>Recipes in this cookbook:</h3>
+              <div className={"recipes-container"}>
+                  {recipes.map((recipe) => (
+                      <div key={recipe.id} className="recipe-card">
+                          <h3>{recipe.title}</h3>
+                          <p>{recipe.description}</p>
+                          <p>Difficulty: {recipe.difficulty}</p>
+                          <p>{recipe.is_vegetarian ? "Vegetarian" : "Non-vegetarian"}</p>
+                          <h4>Ingredients:</h4>
+                          <ul>
+                              {recipe.ingredients.map((ing) => (
+                                  <li key={`${recipe.id}-${ing.name}`}>
+                                      {ing.name} - {ing.amount} {ing.unit}
+                                  </li>
+                              ))}
+                          </ul>
+                      </div>
+                  ))}
+              </div>
+          </div>
+      </div>
+  );
+}

@@ -113,8 +113,19 @@ def create_cookbook():
     cookbook = cookbook_service.create_cookbook(data["name"], data.get("description", ""))
     return jsonify({"id": cookbook.id, "name": cookbook.name, "description": cookbook.description}), 201
 
+@app.post("/api/cookbooks/<int:cookbook_id>/recipes/<int:recipe_id>")
+def add_recipe_to_cookbook(cookbook_id: int, recipe_id: int):
+    result = cookbook_service.add_recipe_to_cookbook(cookbook_id, recipe_id)
+    status = 200 if result["success"] else 400
+    return jsonify(result), status
 
-
+@app.get("/api/cookbooks/<int:cookbook_id>/recipes")
+def get_cookbook_recipes(cookbook_id: int):
+    try:
+        recipes = cookbook_service.get_cookbook_recipes(cookbook_id)
+        return jsonify([r.to_dict() for r in recipes])
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 
