@@ -76,3 +76,18 @@ class RecipeService:
             return {"success": True, "message": "Recipe deleted"}
         except Exception as e:
             return {"success": False, "error": str(e)}
+
+    def edit_recipe(self, recipe_id: int, title: str, description: str,
+                    difficulty: str, is_vegetarian: bool, ingredients: list[Ingredient]) -> dict:
+        for ing in ingredients:
+            if ing.amount < 0:
+                return {"success": False, "error": f"Ingredient '{ing.name}' has negative amount"}
+
+        db = get_connection()
+        try:
+            updated = self.repo.update_recipe(db, recipe_id, title, description, difficulty, is_vegetarian, ingredients)
+            if not updated:
+                return {"success": False, "error": "Recipe not found"}
+            return {"success": True, "message": "Recipe updated"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}

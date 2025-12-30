@@ -96,3 +96,40 @@ class RecipeRepository:
         finally:
             cursor.close()
             db.close()
+
+    def update_recipe(self, db, recipe_id: int, title: str, description: str,
+                      difficulty: str, is_vegetarian: bool, ingredients: list[Ingredient]) -> bool:
+        cursor = db.cursor()
+        try:
+            db.start_transaction()
+
+            cursor.execute("""
+                UPDATE recipe
+                SET title=%s, description=%s, difficulty=%s, is_vegetarian=%s
+                WHERE id=%s
+            """, (title, description, difficulty, is_vegetarian, recipe_id))
+
+            cursor.execute("DELETE FROM recipe_ingredient WHERE recipe_id=%s", (recipe_id,))
+
+            for ing in ingredients:
+                cursor.execute("SELECT id FROM ingredient WHERE name=%s", (ing.name,))
+                row = cursor.fetchone()
+                if row:
+                    ing_id = row[0]
+                else:
+                    cursor.execute("INSERT INTO ingredient (name) VALUES (%s)", (ing.name,))
+                    ing_id = cursor.lastrowid
+
+                cursor.execute("""
+                    INSERT INTO recipe_ingredient (recipe_id, ingredient_id, amount, unit)
+                    VALUES (%s, %s, %s, %s)
+                """, (recipe_id, ing_id, ing.amount, ing.unit))
+
+            db.commit()
+            return True
+        except Exception:
+            db.rollback()
+            raise
+        finally:
+            cursor.close()
+            db.close()

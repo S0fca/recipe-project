@@ -74,6 +74,28 @@ def delete_recipe(recipe_id: int):
     else:
         return jsonify({"error": result["error"]}), 404
 
+@app.put("/api/recipes/<int:recipe_id>")
+def update_recipe(recipe_id: int):
+    data = request.json
+    if not data or "title" not in data or "ingredients" not in data:
+        return jsonify({"success": False, "error": "Title and ingredients are required"}), 400
+
+    ingredients = [
+        Ingredient(id=None, name=i["name"], amount=i["amount"], unit=i["unit"])
+        for i in data["ingredients"]
+    ]
+
+    result = recipe_service.edit_recipe(
+        recipe_id,
+        title=data["title"],
+        description=data.get("description", ""),
+        difficulty=data.get("difficulty", "easy"),
+        is_vegetarian=data.get("is_vegetarian", False),
+        ingredients=ingredients
+    )
+
+    status_code = 200 if result.get("success") else 400
+    return jsonify(result), status_code
 
 
 
