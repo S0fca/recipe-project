@@ -7,9 +7,10 @@ import {useState} from "react";
 import ImportRecipes from "./components/ImportRecipes.tsx";
 import AddRecipeToCookbook from "./components/AddRecipeToCookbook.tsx";
 import ImportCookbooks from "./components/ImportCookbooks.tsx";
+import SummaryReport from "./components/SummaryReport.tsx";
 
 function App() {
-  const [activeTab, setActiveTab] = useState<"recipes" | "cookbooks">("recipes");
+  const [activeTab, setActiveTab] = useState<"recipes" | "cookbooks" | "report">("recipes");
 
   return (
       <>
@@ -20,12 +21,13 @@ function App() {
           <div style={{marginBottom: "20px"}}>
               <button style={{margin: "10px"}} onClick={() => setActiveTab("recipes")}>Recipes</button>
               <button style={{margin: "10px"}} onClick={() => setActiveTab("cookbooks")}>Cookbooks</button>
+              <button style={{margin: "10px"}} onClick={() => setActiveTab("report")}>Report</button>
           </div>
 
           {activeTab === "recipes" && (
-            <>
-                <RecipeList/>
-                <AddRecipeForm onRecipeAdded={() => window.location.reload()}/>
+              <>
+                  <RecipeList/>
+                  <AddRecipeForm onRecipeAdded={() => window.location.reload()}/>
                 <ImportRecipes />
             </>
           )}
@@ -36,6 +38,12 @@ function App() {
                 <AddCookbookForm onCookbookAdded={() => window.location.reload()}/>
                 <AddRecipeToCookbook />
                 <ImportCookbooks />
+            </>
+          )}
+
+          {activeTab === "report" && (
+            <>
+                <SummaryReport />
             </>
           )}
       </>

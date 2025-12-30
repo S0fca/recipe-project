@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from backend.service.recipe_service import RecipeService
 from backend.service.cookbook_service import CookbookService
+from backend.service.report_service import ReportService
 from model import Ingredient
 
 app = Flask(__name__)
@@ -12,6 +13,7 @@ init_db()
 
 recipe_service = RecipeService()
 cookbook_service = CookbookService()
+report_service = ReportService()
 
 
 
@@ -139,6 +141,17 @@ def import_cookbooks():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+
+
+
+@app.get("/api/report/summary")
+def get_summary_report():
+    try:
+        report = report_service.get_summary()
+        return jsonify(report), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 
