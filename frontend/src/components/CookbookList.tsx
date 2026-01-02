@@ -11,11 +11,13 @@ export default function CookbookList() {
   useEffect(() => {
     fetch("http://127.0.0.1:5000/api/cookbooks")
       .then(res => {
-        if (!res.ok) throw new Error("Failed to fetch cookbooks");
+        if (!res.ok) {
+            throw new Error("Failed to load cookbooks");
+        }
         return res.json();
       })
       .then(data => setCookbooks(data))
-      .catch(err => setError(err.message))
+      .catch(() => setError("Failed to load cookbooks"))
       .finally(() => setLoading(false));
   }, []);
 

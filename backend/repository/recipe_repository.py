@@ -1,4 +1,4 @@
-from backend.model import Recipe, Ingredient
+from model import (Recipe, Ingredient)
 from typing import List
 
 class RecipeRepository:

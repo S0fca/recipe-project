@@ -11,16 +11,16 @@ export default function RecipeList() {
   const fetchRecipes = async () => {
     setLoading(true);
     setError(null);
-    try {
-      const res = await fetch("http://127.0.0.1:5000/api/recipes");
-      if (!res.ok) throw new Error("Failed to fetch recipes");
-      const data: Recipe[] = await res.json();
-      setRecipes(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    fetch("http://127.0.0.1:5000/api/recipes")
+      .then(res => {
+        if (!res.ok) {
+            throw new Error("Failed to load recipes");
+        }
+        return res.json();
+      })
+      .then(data => setRecipes(data))
+      .catch(() => setError("Failed to load recipes"))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {

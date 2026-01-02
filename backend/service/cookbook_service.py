@@ -1,5 +1,5 @@
-from backend.db_connection import get_connection
-from backend.repository.cookbook_repository import CookbookRepository
+from db_connection import get_connection
+from repository.cookbook_repository import CookbookRepository
 
 class CookbookService:
     def __init__(self):

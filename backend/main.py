@@ -1,9 +1,10 @@
-from db_init import init_db
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from backend.service.recipe_service import RecipeService
-from backend.service.cookbook_service import CookbookService
-from backend.service.report_service import ReportService
+
+from db_init import init_db
+from service.recipe_service import RecipeService
+from service.cookbook_service import (CookbookService)
+from service.report_service import ReportService
 from model import Ingredient
 
 app = Flask(__name__)

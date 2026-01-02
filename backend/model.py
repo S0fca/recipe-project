@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 class Ingredient:
     def __init__(self, id: int, name: str, amount: float = None, unit: str = None):

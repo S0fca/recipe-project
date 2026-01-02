@@ -1,6 +1,6 @@
-from backend.db_connection import get_connection
-from backend.repository.recipe_repository import RecipeRepository
-from backend.model import Ingredient
+from db_connection import (get_connection)
+from repository.recipe_repository import RecipeRepository
+from model import Ingredient
 
 class RecipeService:
     def __init__(self):

@@ -1,5 +1,5 @@
-from backend.db_connection import get_connection
-from backend.repository.report_repository import ReportRepository
+from db_connection import get_connection
+from repository.report_repository import ReportRepository
 
 class ReportService:
     def __init__(self):
