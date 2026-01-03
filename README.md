@@ -11,51 +11,6 @@ Secondary Technical School of Electrical Engineering Jecna 30, Prague
 ### Date: 
 2\. 1\. 2026
 
-## Functional Requirements
-The application must:
-- Use a real relational database (MySQL)
-- Support at least 5 tables (including junction tables)
-- Include at least 2 views
-- Include at least 1 many-to-many relationship
-- Cover all required data types: float, boolean, enum, string, datetime
-- Allow insert, update, delete, and view operations across multiple tables
-- Use transactions where needed (e.g., adding recipe with ingredients)
-- Generate a summary report with aggregated data
-- Allow import from JSON into at least 2 tables
-- Handle invalid input and errors in a user-friendly way
-
-## Architecture
-The application follows a **layered architecture**:
-- **Database Layer**: MySQL with tables: `recipe`, `ingredient`, `recipe_ingredient`, `cookbook`, `recipe_cookbook`  
-  - Views: `view_recipe_details`, `view_cookbook_summary`  
-- **Repository Layer**: Handles direct SQL queries  
-- **Service Layer**: Business logic, transactions, validations  
-- **API Layer**: Flask REST API endpoints  
-- **Frontend**: React application to interact with the API  
-
-## Behavioral diagram
-### Recipe Management
-![Activity diagram – Recipe Management](./images/Recipe.png)
-### Cookbook Management
-![Activity diagram – Cookbook Management](./images/Cookbook.png)
-
-## Database Schema
-![Database Schema](./images/ER.png)
-
-## Non-functional requirements
-### Backend (Python)
-- flask 
-- flask-cors
-- mysql-connector-python 
-
-### Frontend (React/Node.js)
-- react 
-- react-dom
-- npm
-
-### Database
-- MySQL server
-
 ## Installation and configuration
 
 ### Database
@@ -136,4 +91,51 @@ Recipes and cookbooks can be imported from JSON files via the web UI.
       ]
     }
 ```
+## Non-functional requirements
+### Backend (Python)
+- flask 
+- flask-cors
+- mysql-connector-python 
+
+### Frontend (React/Node.js)
+- react 
+- react-dom
+- npm
+
+### Database
+- MySQL server
+
+## Functional Requirements
+The application must:
+- Use a real relational database (MySQL)
+- Support at least 5 tables (including junction tables)
+- Include at least 2 views
+- Include at least 1 many-to-many relationship
+- Cover all required data types: float, boolean, enum, string, datetime
+- Allow insert, update, delete, and view operations across multiple tables
+- Use transactions where needed (e.g., adding recipe with ingredients)
+- Generate a summary report with aggregated data
+- Allow import from JSON into at least 2 tables
+- Handle invalid input and errors in a user-friendly way
+
+## Architecture
+The application follows a **layered architecture**:
+- **Database Layer**: MySQL with tables: `recipe`, `ingredient`, `recipe_ingredient`, `cookbook`, `recipe_cookbook`  
+  - Views: `view_recipe_details`, `view_cookbook_summary`  
+- **Repository Layer**: Handles direct SQL queries  
+- **Service Layer**: Business logic, transactions, validations  
+- **API Layer**: Flask REST API endpoints  
+- **Frontend**: React application to interact with the API  
+
+## Database Schema
+![Database Schema](./images/ER.png)
+
+## Behavioral diagram
+### Recipe Management
+![Activity diagram – Recipe Management](./images/Recipe.png)
+### Cookbook Management
+![Activity diagram – Cookbook Management](./images/Cookbook.png)
+
+
+
 
