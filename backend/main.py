@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
 
 from db_init import init_db
@@ -24,7 +24,7 @@ def handle_exception(e):
     code = getattr(e, 'code', 500)
     response = {
         "error": type(e).__name__,
-        "description": str(e),
+        "description": str(e.description),
         "code": code
     }
     print(f"Error ({code}): {e}")
@@ -36,20 +36,25 @@ def handle_exception(e):
 
 @app.get("/api/recipes")
 def get_recipes():
-    try:
-        recipes = recipe_service.get_all_recipes()
-        return jsonify([r.to_dict() for r in recipes])
-    except Exception as e:
-        raise e
+    recipes = recipe_service.get_all_recipes()
+    return jsonify([r.to_dict() for r in recipes])
 
 @app.post("/api/recipes")
 def add_recipe():
     data = request.json
-    if not data or "title" not in data or "ingredients" not in data:
-        return jsonify({"error": "Bad Request", "description": "Title and ingredients are required"}), 400
 
-    ingredients = [Ingredient(id=None, name=i["name"], amount=i["amount"], unit=i["unit"])
-                   for i in data["ingredients"]]
+    if not data or "title" not in data or "ingredients" not in data:
+        abort(400, description="Title and ingredients are required")
+
+    ingredients = [
+        Ingredient(
+            id=None,
+            name=i["name"],
+            amount=i["amount"],
+            unit=i["unit"]
+        )
+        for i in data["ingredients"]
+    ]
 
     recipe = recipe_service.add_recipe(
         title=data["title"],
@@ -58,13 +63,15 @@ def add_recipe():
         is_vegetarian=data.get("is_vegetarian", False),
         ingredients=ingredients
     )
+
     return jsonify(recipe), 201
 
 @app.post("/api/import/recipes")
 def import_recipes():
     data = request.json
+
     if not data or "recipes" not in data:
-        return jsonify({"error": "Bad Request", "description": "Invalid import format"}), 400
+        abort(400, description="Invalid import format")
 
     result = recipe_service.import_recipes(data["recipes"])
     return jsonify(result), 200
@@ -72,19 +79,26 @@ def import_recipes():
 @app.delete("/api/recipes/<int:recipe_id>")
 def delete_recipe(recipe_id: int):
     result = recipe_service.delete_recipe(recipe_id)
-    if result["success"]:
-        return jsonify({"message": result["message"]}), 200
-    else:
-        return jsonify({"error": result["error"]}), 404
+
+    if not result["success"]:
+        abort(404, description=result.get("error", "Recipe not found"))
+
+    return jsonify({"message": result["message"]}), 200
 
 @app.put("/api/recipes/<int:recipe_id>")
 def update_recipe(recipe_id: int):
     data = request.json
+
     if not data or "title" not in data or "ingredients" not in data:
-        return jsonify({"success": False, "error": "Title and ingredients are required"}), 400
+        abort(400, description="Title and ingredients are required")
 
     ingredients = [
-        Ingredient(id=None, name=i["name"], amount=i["amount"], unit=i["unit"])
+        Ingredient(
+            id=None,
+            name=i["name"],
+            amount=i["amount"],
+            unit=i["unit"]
+        )
         for i in data["ingredients"]
     ]
 
@@ -97,8 +111,11 @@ def update_recipe(recipe_id: int):
         ingredients=ingredients
     )
 
-    status_code = 200 if result.get("success") else 400
-    return jsonify(result), status_code
+    if not result.get("success"):
+        abort(400, description=result.get("error", "Failed to update recipe"))
+
+    return jsonify(result), 200
+
 
 
 
@@ -110,49 +127,53 @@ def get_cookbooks():
 @app.post("/api/cookbooks")
 def create_cookbook():
     data = request.json
-    if not data or "name" not in data:
-        return jsonify({"error": "Bad Request", "description": "Name is required"}), 400
 
-    cookbook = cookbook_service.create_cookbook(data["name"], data.get("description", ""))
-    return jsonify({"id": cookbook.id, "name": cookbook.name, "description": cookbook.description}), 201
+    if not data or "name" not in data:
+        abort(400, description="Name is required")
+
+    cookbook = cookbook_service.create_cookbook(
+        data["name"],
+        data.get("description", "")
+    )
+
+    return jsonify({
+        "id": cookbook.id,
+        "name": cookbook.name,
+        "description": cookbook.description
+    }), 201
 
 @app.post("/api/cookbooks/<int:cookbook_id>/recipes/<int:recipe_id>")
 def add_recipe_to_cookbook(cookbook_id: int, recipe_id: int):
     result = cookbook_service.add_recipe_to_cookbook(cookbook_id, recipe_id)
-    status = 200 if result["success"] else 400
-    return jsonify(result), status
+
+    if not result["success"]:
+        abort(400, description=result.get("error", "Failed to add recipe"))
+
+    return jsonify(result), 200
 
 @app.get("/api/cookbooks/<int:cookbook_id>/recipes")
 def get_cookbook_recipes(cookbook_id: int):
-    try:
-        recipes = cookbook_service.get_cookbook_recipes(cookbook_id)
-        return jsonify([r.to_dict() for r in recipes])
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    recipes = cookbook_service.get_cookbook_recipes(cookbook_id)
+    return jsonify([r.to_dict() for r in recipes])
 
 @app.post("/api/import/cookbooks")
 def import_cookbooks():
     data = request.json
+
     if not data or "cookbooks" not in data:
-        return jsonify({"error": "Invalid import format"}), 400
+        abort(400, description="Invalid import format")
 
-    try:
-        result = cookbook_service.import_cookbooks(data["cookbooks"])
-        return jsonify(result), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
+    result = cookbook_service.import_cookbooks(data["cookbooks"])
+    return jsonify(result), 200
 
 
 
 
 @app.get("/api/report/summary")
 def get_summary_report():
-    try:
-        report = report_service.get_summary()
-        return jsonify(report), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    report = report_service.get_summary()
+    return jsonify(report), 200
+
 
 
 

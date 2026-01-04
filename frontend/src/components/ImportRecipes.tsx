@@ -34,11 +34,16 @@ export default function ImportRecipes() {
       if (!res.ok) {
         setMessage(data.description || "Import failed");
       } else {
+        const errorsDesc = " " + data.errors
+          .map((e: { error: string }) => e.error)
+          .join(", ");
+
         setMessage(
-          `Import done: ${data.imported} OK, ${data.failed} errors`
+          `Import done: ${data.imported} OK, ${data.failed} errors ${errorsDesc}`
         );
       }
     } catch (err) {
+      console.log(err)
       setMessage("Invalid JSON file");
     }
   };

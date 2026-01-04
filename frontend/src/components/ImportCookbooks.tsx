@@ -1,11 +1,5 @@
 import { useState } from "react";
 
-type ImportResult = {
-  imported: number;
-  failed: number;
-  errors?: { index: number; name?: string; error: string }[];
-};
-
 export default function ImportCookbooks() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string>("");
@@ -34,14 +28,18 @@ export default function ImportCookbooks() {
         body: JSON.stringify(json),
       });
 
-      const result: ImportResult = await res.json();
+      const data = await res.json();
 
       if (!res.ok) {
-        setMessage(
-          result.errors?.map((e) => `${e.index}: ${e.error}`).join(", ") || "Import failed"
-        );
+        setMessage(data.description || "Import failed");
       } else {
-        setMessage(`Imported: ${result.imported}, Failed: ${result.failed}`);
+        const errorsDesc = " " + data.errors
+          .map((e: { error: string }) => e.error)
+          .join(", ");
+
+        setMessage(
+          `Import done: ${data.imported} OK, ${data.failed} errors ${errorsDesc}`
+        );
       }
     } catch {
       setMessage("Invalid JSON file");
