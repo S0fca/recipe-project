@@ -10,7 +10,17 @@ import ImportCookbooks from "./components/ImportCookbooks.tsx";
 import SummaryReport from "./components/SummaryReport.tsx";
 
 function App() {
-  const [activeTab, setActiveTab] = useState<"recipes" | "cookbooks" | "report">("recipes");
+    const [activeTab, setActiveTab] = useState<"recipes" | "cookbooks" | "report">(
+        () => (localStorage.getItem("activeTab") as any) || "recipes"
+    );
+
+    const changeTab = (tab: "recipes" | "cookbooks" | "report") => {
+        setActiveTab(tab);
+        localStorage.setItem("activeTab", tab);
+    };
+
+    const [refreshKey, setRefreshKey] = useState(0);
+    const refresh = () => setRefreshKey(k => k + 1);
 
   return (
       <>
@@ -19,27 +29,31 @@ function App() {
           </h1>
 
           <div style={{marginBottom: "20px"}}>
-              <button style={{margin: "10px"}} onClick={() => setActiveTab("recipes")}>Recipes</button>
-              <button style={{margin: "10px"}} onClick={() => setActiveTab("cookbooks")}>Cookbooks</button>
-              <button style={{margin: "10px"}} onClick={() => setActiveTab("report")}>Report</button>
+              <button style={{margin: "10px"}} onClick={() => changeTab("recipes")}>Recipes</button>
+              <button style={{margin: "10px"}} onClick={() => changeTab("cookbooks")}>Cookbooks</button>
+              <button style={{margin: "10px"}} onClick={() => changeTab("report")}>Report</button>
           </div>
 
           {activeTab === "recipes" && (
               <>
-                  <RecipeList/>
-                  <AddRecipeForm onRecipeAdded={() => window.location.reload()}/>
-                <ImportRecipes />
-            </>
+                  {activeTab === "recipes" && (
+                      <>
+                        <RecipeList key={refreshKey} />
+                        <AddRecipeForm onRecipeAdded={refresh} />
+                        <ImportRecipes onImported={refresh} />
+                      </>
+                  )}
+              </>
           )}
 
           {activeTab === "cookbooks" && (
             <>
-                <CookbookList/>
-                <AddCookbookForm onCookbookAdded={() => window.location.reload()}/>
-                <AddRecipeToCookbook />
-                <ImportCookbooks />
+              <CookbookList key={refreshKey} />
+              <AddCookbookForm onCookbookAdded={refresh} />
+              <AddRecipeToCookbook onAdded={refresh} />
+              <ImportCookbooks onImported={refresh} />
             </>
-          )}
+      )}
 
           {activeTab === "report" && (
             <>

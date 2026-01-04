@@ -1,7 +1,11 @@
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
-export default function ImportRecipes() {
+type Props = {
+  onImported?: () => void;
+};
+
+export default function ImportRecipes({ onImported }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string>("");
 
@@ -41,6 +45,8 @@ export default function ImportRecipes() {
         setMessage(
           `Import done: ${data.imported} OK, ${data.failed} errors ${errorsDesc}`
         );
+
+        onImported?.();
       }
     } catch (err) {
       console.log(err)

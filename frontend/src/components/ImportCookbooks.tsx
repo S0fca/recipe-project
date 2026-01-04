@@ -1,6 +1,10 @@
 import { useState } from "react";
 
-export default function ImportCookbooks() {
+type Props = {
+  onImported?: () => void;
+};
+
+export default function ImportCookbooks({ onImported }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string>("");
 
@@ -40,6 +44,7 @@ export default function ImportCookbooks() {
         setMessage(
           `Import done: ${data.imported} OK, ${data.failed} errors ${errorsDesc}`
         );
+        onImported?.();
       }
     } catch {
       setMessage("Invalid JSON file");

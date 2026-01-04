@@ -30,10 +30,12 @@ class CookbookService:
         try:
             db.start_transaction()
             added = self.repo.add_recipe_to_cookbook(db, cookbook_id, recipe_id)
-            db.commit()
 
             if not added:
+                db.rollback()
                 return {"success": False, "error": "Recipe already in cookbook"}
+
+            db.commit()
             return {"success": True, "message": "Recipe added to cookbook"}
         except Exception as e:
             db.rollback()
@@ -44,15 +46,45 @@ class CookbookService:
     def get_cookbook_recipes(self, cookbook_id: int):
         db = get_connection()
         try:
-            recipes = self.repo.get_recipes_in_cookbook(db, cookbook_id)
-            return recipes
+            return self.repo.get_recipes_in_cookbook(db, cookbook_id)
         finally:
             db.close()
 
     def import_cookbooks(self, cookbooks_data: list[dict]):
         db = get_connection()
+        imported = 0
+        errors = []
+
         try:
-            result = self.repo.import_cookbooks(db, cookbooks_data)
-            return result
+            db.start_transaction()
+
+            for idx, cb in enumerate(cookbooks_data):
+                name = cb.get("name")
+                description = cb.get("description", "")
+
+                if not name:
+                    errors.append({"index": idx, "error": "Missing name"})
+                    continue
+
+                try:
+                    self.repo.insert_cookbook(db, name, description)
+                    imported += 1
+                except Exception as e:
+                    errors.append({
+                        "index": idx,
+                        "name": name,
+                        "error": str(e)
+                    })
+
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
         finally:
             db.close()
+
+        return {
+            "imported": imported,
+            "failed": len(errors),
+            "errors": errors
+        }

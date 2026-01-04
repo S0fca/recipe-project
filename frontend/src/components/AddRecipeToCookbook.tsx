@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import type { Recipe, Cookbook } from "../types.ts";
 
-export default function AddRecipeToCookbook() {
+type Props = {
+  onAdded?: () => void;
+};
+
+export default function AddRecipeToCookbook({ onAdded }: Props) {
+
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [cookbooks, setCookbooks] = useState<Cookbook[]>([]);
   const [selectedRecipe, setSelectedRecipe] = useState<number | "">("");
@@ -40,6 +45,7 @@ export default function AddRecipeToCookbook() {
         setMessage(result.error || "Failed to add recipe to cookbook.");
       } else {
         setMessage(result.message || "Recipe added successfully!");
+        onAdded?.();
       }
     } catch (err: any) {
       setMessage("Error: " + err.message);
