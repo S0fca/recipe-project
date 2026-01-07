@@ -11,6 +11,20 @@ Secondary Technical School of Electrical Engineering Jecna 30, Prague
 ### Date: 
 2\. 1\. 2026
 
+## Requirements
+### Backend (Python)
+- flask 
+- flask-cors
+- mysql-connector-python 
+
+### Frontend (React/Node.js)
+- react 
+- react-dom
+- npm
+
+### Database
+- MySQL server
+
 ## Installation and configuration
 
 ### Database
@@ -62,6 +76,19 @@ npm install
 ```powershell
 npm run dev
 ```
+> **Note:** On school computers the version may be outdated.
+> You can change it to a compatible version in `package.json`   
+> Example:   
+> ```json
+> "devDependencies": {
+>   "vite": "^4.5.0"
+> }
+> ```
+> After changing the version, delete the old dependencies and reinstall:
+> ```powershell
+> rm -rf node_modules package-lock.json
+> npm install
+> ```
 
 ## Importing Data
 Recipes and cookbooks can be imported from JSON files via the web UI.
@@ -91,34 +118,42 @@ Recipes and cookbooks can be imported from JSON files via the web UI.
       ]
     }
 ```
-## Non-functional requirements
-### Backend (Python)
-- flask 
-- flask-cors
-- mysql-connector-python 
 
-### Frontend (React/Node.js)
-- react 
-- react-dom
-- npm
 
-### Database
-- MySQL server
 
-## Functional Requirements
-The application must:
-- Use a real relational database (MySQL)
-- Support at least 5 tables (including junction tables)
-- Include at least 2 views
-- Include at least 1 many-to-many relationship
-- Cover all required data types: float, boolean, enum, string, datetime
-- Allow insert, update, delete, and view operations across multiple tables
-- Use transactions where needed (e.g., adding recipe with ingredients)
-- Generate a summary report with aggregated data
-- Allow import from JSON into at least 2 tables
-- Handle invalid input and errors in a user-friendly way
+## Requirement analysis
+The goal of the application is to provide a web-based system for managing recipes and cookbooks using a relational MySQL database.
+### Functional Requirements
+- **FR1:** The user can create a new recipe including its ingredients.
+- **FR2:** The user can view a list of all recipes.
+- **FR3:** The user can edit an existing recipe, including its ingredients.
+- **FR4:** The user can delete a recipe.
+- **FR5:** The user can create a new cookbook.
+- **FR6:** The user can view a list of all cookbooks.
+- **FR7:** The user can add a recipe to a cookbook.
+- **FR8:** The user can view the details of a cookbook, including all assigned recipes.
+- **FR9:** The system stores recipes and ingredients across multiple database tables.
+- **FR10:** Creating or updating a recipe with its ingredients is performed within a single database transaction.
+- **FR11:** The user can import recipes from a JSON file.
+- **FR12:** The user can import cookbooks from a JSON file.
+- **FR13:** The system validates input data during import (e.g. required fields, invalid values).
+- **FR14:** The system allows generation of a summary report with aggregated data.
 
-## Architecture
+### Non-functional requirements
+- **NFR1:** The application uses a real relational database management system (MySQL).
+- **NFR2:** The database consists of at least five tables, including relational and junction tables.
+- **NFR3:** The database contains at least two database views.
+- **NFR4:** The system implements a many-to-many relationship between recipes and cookbooks.
+- **NFR5:** The database model includes various data types (string, float, boolean, enum, datetime).
+- **NFR6:** The system maintains database consistency using transaction rollbacks in case of errors.
+- **NFR7:** If the database connection fails, the system displays a clear and understandable error message.
+- **NFR8:** Configuration errors (e.g. invalid database credentials) are reported clearly to the user.
+- **NFR9:** The application provides meaningful error messages for invalid user input.
+- **NFR10:** The backend and frontend are separated using a REST API architecture.
+- **NFR11:** The application can be started according to the provided documentation without requiring an IDE.
+
+## Design
+### Architecture
 The application follows a **layered architecture**:
 - **Database Layer**: MySQL with tables: `recipe`, `ingredient`, `recipe_ingredient`, `cookbook`, `recipe_cookbook`  
   - Views: `view_recipe_details`, `view_cookbook_summary`  
@@ -127,15 +162,37 @@ The application follows a **layered architecture**:
 - **API Layer**: Flask REST API endpoints  
 - **Frontend**: React application to interact with the API  
 
-## Database Schema
+### Database Schema
 ![Database Schema](./images/ER.png)
 
-## Behavioral diagram
-### Recipe Management
+### Behavioral diagram
+#### Recipe Management
 ![Activity diagram – Recipe Management](./images/Recipe.png)
-### Cookbook Management
+#### Cookbook Management
 ![Activity diagram – Cookbook Management](./images/Cookbook.png)
 
+## REST API Overview
 
+The backend provides a RESTful API implemented using Flask.  
+All endpoints communicate using JSON over HTTP.
 
+### Recipes
+- **GET /recipes** – Returns all recipes
+- **POST /recipes** – Creates a new recipe with ingredients
+- **PUT /recipes/{recipe_id}** – Updates an existing recipe
+- **DELETE /recipes/{recipe_id}** – Deletes a recipe
+- **POST /import/recipes** – Imports recipes from a JSON file
+
+### Cookbooks
+- **GET /cookbooks** – Returns all cookbooks
+- **POST /cookbooks** – Creates a new cookbook
+- **POST /cookbooks/{cookbook_id}/recipes/{recipe_id}** – Adds a recipe to a cookbook
+- **GET /cookbooks/{cookbook_id}/recipes** – Returns recipes assigned to a cookbook
+- **POST /import/cookbooks** – Imports cookbooks from a JSON file
+
+### Error Handling
+Errors are returned as JSON with HTTP status codes (400, 404, 500).
+
+## License / legal note
+This project is a school project and is not intended for commercial use. All source code was created by the author for educational purposes.
 
