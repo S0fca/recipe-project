@@ -9,7 +9,7 @@ Sofia Hennelová, sofia.hennelova@gmail.com
 ### School: 
 Secondary Technical School of Electrical Engineering Jecna 30, Prague
 ### Date: 
-2\. 1\. 2026
+7\. 1\. 2026
 
 ## Requirements
 ### Backend (Python)
@@ -93,11 +93,12 @@ npm run dev
 ## Importing Data
 Recipes and cookbooks can be imported from JSON files via the web UI.
 ### Recipe JSON format
+- Title and ingredients are required
 ```json
     {
       "recipes": [
         {
-          "title": "Title",
+          "title": "Title", 
           "description": "Description",
           "difficulty": "easy|medium|hard",
           "is_vegetarian": false,
@@ -110,6 +111,7 @@ Recipes and cookbooks can be imported from JSON files via the web UI.
     }
 ```
 ### Cookbook JSON format
+- Name is required
 ```json
     {
       "cookbooks": [
@@ -177,21 +179,41 @@ The backend provides a RESTful API implemented using Flask.
 All endpoints communicate using JSON over HTTP.
 
 ### Recipes
-- **GET /recipes** – Returns all recipes
-- **POST /recipes** – Creates a new recipe with ingredients
-- **PUT /recipes/{recipe_id}** – Updates an existing recipe
-- **DELETE /recipes/{recipe_id}** – Deletes a recipe
-- **POST /import/recipes** – Imports recipes from a JSON file
+- **GET /recipes** - Returns all recipes
+- **POST /recipes** - Creates a new recipe with ingredients
+- **PUT /recipes/{recipe_id}** - Updates an existing recipe
+- **DELETE /recipes/{recipe_id}** - Deletes a recipe
+- **POST /import/recipes** - Imports recipes from a JSON file
 
 ### Cookbooks
-- **GET /cookbooks** – Returns all cookbooks
-- **POST /cookbooks** – Creates a new cookbook
-- **POST /cookbooks/{cookbook_id}/recipes/{recipe_id}** – Adds a recipe to a cookbook
-- **GET /cookbooks/{cookbook_id}/recipes** – Returns recipes assigned to a cookbook
-- **POST /import/cookbooks** – Imports cookbooks from a JSON file
+- **GET /cookbooks** - Returns all cookbooks
+- **POST /cookbooks** - Creates a new cookbook
+- **POST /cookbooks/{cookbook_id}/recipes/{recipe_id}** - Adds a recipe to a cookbook
+- **GET /cookbooks/{cookbook_id}/recipes** - Returns recipes assigned to a cookbook
+- **POST /import/cookbooks** - Imports cookbooks from a JSON file
+- **DELETE /cookbooks/{recipe_id}** - Deletes a cookbook
 
 ### Error Handling
 Errors are returned as JSON with HTTP status codes (400, 404, 500).
+```json
+{
+  "code": ,
+  "description": "",
+  "error": ""
+}
+```
+#### Possible exceptions
+
+Recipe
+- 400, Title and ingredients are required
+- 404, Recipe not found
+- 400, Invalid import format
+
+Cookbook
+- 400, Name is required
+- 400, Failed to add recipe to cookbook
+- 400, Invalid import format
+- 404, Cookbook not found
 
 ## License / legal note
 This project is a school project and is not intended for commercial use. All source code was created by the author for educational purposes.
