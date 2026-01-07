@@ -88,3 +88,21 @@ class CookbookService:
             "failed": len(errors),
             "errors": errors
         }
+
+    def delete_cookbook(self, cookbook_id):
+        db = get_connection()
+        try:
+            db.start_transaction()
+            deleted = self.repo.delete_cookbook(db, cookbook_id)
+
+            if not deleted:
+                db.rollback()
+                return {"success": False, "error": "Cookbook not found"}
+
+            db.commit()
+            return {"success": True, "message": "Cookbook deleted"}
+        except Exception as e:
+            db.rollback()
+            return {"success": False, "error": str(e)}
+        finally:
+            db.close()

@@ -166,7 +166,14 @@ def import_cookbooks():
     result = cookbook_service.import_cookbooks(data["cookbooks"])
     return jsonify(result), 200
 
+@app.delete("/api/cookbooks/<int:cookbook_id>")
+def delete_cookbook(cookbook_id: int):
+    result = cookbook_service.delete_cookbook(cookbook_id)
 
+    if not result["success"]:
+        abort(404, description=result.get("error", "Recipe not found"))
+
+    return jsonify({"message": result["message"]}), 200
 
 
 @app.get("/api/report/summary")

@@ -21,10 +21,25 @@ export default function CookbookList() {
       .finally(() => setLoading(false));
   }, []);
 
+  const handleDelete = async (id: number) => {
+        try {
+          const res = await fetch(`http://127.0.0.1:5000/api/cookbooks/${id}`, {
+            method: "DELETE",
+          });
+          const result = await res.json();
+
+          if (!res.ok) throw new Error(result.error || "Failed to delete cookbook");
+
+          setCookbooks((prev) => prev.filter((c) => c.id !== id));
+        } catch (err: any) {
+          alert(`Error deleting recipe: ${err.message}`);
+        }
+  }
+
   if (loading) return <p>Loading cookbooks...</p>;
   if (error) return <p>Error: {error}</p>;
 
-  return (
+    return (
       <>
           <h2>Cookbooks</h2>
           <div className="recipes-container">
@@ -36,12 +51,15 @@ export default function CookbookList() {
                           <h3>{cb.name}</h3>
                           <p>{cb.description}</p>
                           <p>Recipes: {cb.recipe_count}</p>
+                          <button style={{margin: "10px"}}
+                                              onClick={() => handleDelete(cb.id)}>Delete</button>
+
                       </div>
                   </span>
               ))}
           </div>
           {selectedCookbook && (
-            <CookbookDetails cookbook={selectedCookbook} onClose={() => setSelectedCookbook(null)} />
+              <CookbookDetails cookbook={selectedCookbook} onClose={() => setSelectedCookbook(null)} />
           )}
       </>
   );

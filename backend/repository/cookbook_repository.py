@@ -108,3 +108,11 @@ class CookbookRepository:
             )
         finally:
             cursor.close()
+
+    def delete_cookbook(self, db, cookbook_id):
+        cursor = db.cursor()
+        try:
+            cursor.execute("DELETE FROM cookbook WHERE id=%s", (cookbook_id,))
+            return cursor.rowcount > 0
+        finally:
+            cursor.close()
