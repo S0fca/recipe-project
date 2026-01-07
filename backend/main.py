@@ -147,7 +147,7 @@ def add_recipe_to_cookbook(cookbook_id: int, recipe_id: int):
     result = cookbook_service.add_recipe_to_cookbook(cookbook_id, recipe_id)
 
     if not result["success"]:
-        abort(400, description=result.get("error", "Failed to add recipe"))
+        abort(400, description=result.get("error", "Failed to add recipe to cookbook"))
 
     return jsonify(result), 200
 
@@ -171,7 +171,7 @@ def delete_cookbook(cookbook_id: int):
     result = cookbook_service.delete_cookbook(cookbook_id)
 
     if not result["success"]:
-        abort(404, description=result.get("error", "Recipe not found"))
+        abort(404, description=result.get("error", "Cookbook not found"))
 
     return jsonify({"message": result["message"]}), 200
 
